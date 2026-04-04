@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useLayoutEffect } from 'react'
 
 /* ─────────────────────────────────────────
    GLYPH CACHE — module-level, persiste tra render
@@ -23,7 +23,7 @@ function buildGlyph(letter, cols, rows, thresh) {
   ctx.textBaseline = 'middle'
   ctx.save()
   ctx.scale(cols / fs, rows / fs)
-  ctx.fillText(letter.toUpperCase(), fs / 2, fs / 2)
+  ctx.fillText(letter, fs / 2, fs / 2)
   ctx.restore()
 
   const data = ctx.getImageData(0, 0, cols, rows).data
@@ -88,7 +88,7 @@ export default function AsciiText({
     const el = preRef.current
     if (!el) return
 
-    const letters = text.toUpperCase().split('')
+    const letters = text.split('')
     const glyphs  = letters.map(l => getGlyph(l, cols, rows, thresh))
     const n       = glyphs.length
     const clen    = chars.length
@@ -114,13 +114,13 @@ export default function AsciiText({
     el.textContent = out.join('')
   }, [text, cols, rows, gap, chars, thresh])
 
-  useEffect(() => {
-    render()
-    ivRef.current = setInterval(render, speed)
-    return () => {
-      if (ivRef.current) clearInterval(ivRef.current)
-    }
-  }, [render, speed])
+useLayoutEffect(() => {
+  render()
+  ivRef.current = setInterval(render, speed)
+  return () => {
+    if (ivRef.current) clearInterval(ivRef.current)
+  }
+}, [render, speed])
 
   return (
     <pre
@@ -128,7 +128,7 @@ export default function AsciiText({
       className={className}
       style={{
         fontFamily: "'Courier New', Courier, monospace",
-        fontSize: `clamp(3px, ${80 / (text.length * cols)}vw, 9px)`,
+        fontSize: `clamp(3px, ${200 / (text.length * cols)}vw, 9px)`,
         lineHeight: '1.18',
         letterSpacing: '0.07em',
         whiteSpace: 'pre',
