@@ -21,7 +21,6 @@ export default function Home() {
   const alredayLoaded = useRef(false)
   const percentRef = useRef(null)
   const hoveredProject = useRef(null)
-  const cursorRef = useRef(null)
     useGSAP(() => {
     const wrap = wrapperRef.current
     const ascii = asciiRef.current
@@ -71,7 +70,7 @@ export default function Home() {
               setAsciiText("A FULL STACK");
               setAsciiSecondText("WEB DEVELOPER")
             }
-          else if(self.progress>0.6 && self.progress<0.9)
+          else if(self.progress>0.6)
         { 
               setAsciiText("BASED");
               setAsciiSecondText("IN BRESCIA")
@@ -83,10 +82,7 @@ export default function Home() {
                  dxRef.current = asciiRect.left-5
                }
             }
-            else if (self.progress>0.9){
-            setAsciiText("WORKS");
-            surname.classList.add("opacity-[0]")
-            }
+            
       },
       onEnterBack:()=>{
         percentRef.current.classList.remove("opacity-0")
@@ -98,6 +94,8 @@ export default function Home() {
         })
       },
       onLeave:()=>{
+           setAsciiText("WORKS");
+           surname.classList.add("opacity-[0]")
         percentRef.current.classList.add("opacity-0")
         alredayLoaded.current = true;
         name.classList.add("text-start")
@@ -116,18 +114,10 @@ export default function Home() {
       wrap.removeEventListener('mouseleave', onLeave)
     }
   }, { scope: wrapperRef, dependencies:[secondRef] })
- useEffect(()=>{
-      const onMove = (e)=>{
-        cursorRef.current.style.left = e.clientX + 'px'
-        cursorRef.current.style.top = e.clientY + 'px'
-      }
-      window.addEventListener('mousemove',onMove)
-      return () => window.removeEventListener('mousemove', onMove)
-    },[])
+
   return (
     
    <div>
-    <div ref={cursorRef} className="w-3 h-3 bg-white rounded-full fixed pointer-events-none z-50 -translate-x-1/2 -translate-y-1/2 mix-blend-difference" />
       <div ref={wrapperRef} 
        className="bg-black flex flex-col items-center justify-center w-full h-[100svh] relative">
         <p ref={percentRef} className="text-gray-400 absolute bottom-0 right-[50%] translate-x-1/2">0%</p>
@@ -164,7 +154,7 @@ export default function Home() {
   <p className="text-gray-400">Stack</p>
   <p className="text-gray-400">Year</p>
 
-  <div className=" contents group hover:text-green-400" 
+  <div className=" contents group hover:text-green-400 cursor-pointer" 
   onMouseEnter={()=>{hoveredProject.current = "memoryForm"}}
   onMouseLeave={()=>{hoveredProject.current = null}}
   >
@@ -174,7 +164,7 @@ export default function Home() {
     <p>NextJs•Tailwind</p>
     <p>2026</p>
   </div>
-  <div className="contents group hover:text-green-400">
+  <div className="contents group hover:text-green-400 cursor-pointer">
     <p>02</p>
     <p>Elsolito/Portfolio</p>
     <p>Navigation through Tv or GameBoy</p>
