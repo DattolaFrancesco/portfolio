@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Ascii from "./components/Ascii"
 import GlitchAscii from "./components/GlitchAscii"
+import Cube from "./components/Cube";
 import gsap from "gsap"
 import { useRef, useEffect, useState } from "react";
 import { useGSAP } from "@gsap/react";
@@ -15,6 +16,8 @@ export default function Home() {
   const [asciiText,setAsciiText] = useState("FRANCESCO")
   const [asciiSecondText,setAsciiSecondText] = useState("DATTOLA")
   const isWorkRef = useRef(false)
+  const dxRef = useRef(0)
+  const dyRef = useRef(0)
     useGSAP(() => {
     const wrap = wrapperRef.current
     const ascii = asciiRef.current
@@ -47,7 +50,7 @@ export default function Home() {
         ease: "power1.inOut",
       })
     }
-
+      
     ScrollTrigger.create({
       trigger: wrap,
       start: 'top top',
@@ -78,40 +81,45 @@ export default function Home() {
             }
           else if(self.progress>0.6 && self.progress<0.9)
         { 
+              dot.forEach((d)=>{
+              d.classList.remove("hidden")
+              })
               dot[0].classList.remove("text-white")
               dot[0].classList.remove("scale-[1.5]")
               dot[1].classList.remove("text-white")
               dot[1].classList.remove("scale-[1.5]")
               dot[2].classList.add("text-white")
               dot[2].classList.add("scale-[1.5]")
-              setAsciiText("BASED IN");
-              setAsciiSecondText("BRESCIA")
+              setAsciiText("BASED");
+              setAsciiSecondText("IN BRESCIA")
                surname.classList.remove("opacity-[0]")
+            const asciiRect  = ascii.getBoundingClientRect()
+            dyRef.current = asciiRect.bottom
+            dxRef.current = asciiRect.left
+            }
+            else if (self.progress>0.9){
+            setAsciiText("WORKS");
+            surname.classList.add("opacity-[0]")
+             dot.forEach((d)=>{
+            d.classList.add("hidden")
+            })
+
             }
       },
       onEnterBack:()=>{
-         dot.forEach((d)=>{
-          d.classList.remove("hidden")
-        })
+        name.classList.remove("text-start")
+        isWorkRef.current = false
           gsap.to(ascii,{
           x:0,
           y:0
         })
       },
       onLeave:()=>{
-        dot.forEach((d)=>{
-          d.classList.add("hidden")
-        })
-        setAsciiText("WORKS");
-        surname.classList.add("opacity-[0]")
-    const asciiRect  = ascii.getBoundingClientRect()
-    const secondRect = secondRef.current.getBoundingClientRect()
-    const dx = asciiRect.right - secondRect.right
-    const dy = asciiRect.bottom + 30
-    console.log(asciiRect,secondRect)
+        name.classList.add("text-start")
+        isWorkRef.current = true
         gsap.to(ascii,{
-          x:dx,
-          y:dy
+          x:-dxRef.current,
+          y:dyRef.current
         })
       }
     })
@@ -158,7 +166,14 @@ export default function Home() {
       />
       </div>
       </div>
-      <div ref={secondRef} className=" w-full h-[100svh]"></div>
+      <div ref={secondRef} className=" w-full h-[100svh] flex justify-between items-center">
+        <div className={`text-white w-full flex text-xs justify-between ms-[3] border-t border-b border-white py-3`}> 
+          <p>Memory Form</p>
+          <p>Archive of photo fully draggable</p>
+          <p>developed in nextJs and tailwind</p>
+        </div>
+        <Cube/>
+      </div>
       
    </div>
    

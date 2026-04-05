@@ -128,7 +128,7 @@ useLayoutEffect(() => {
       className={className}
       style={{
         fontFamily: "'Courier New', Courier, monospace",
-        fontSize: `clamp(3px, ${200 / (text.length * cols)}vw, 9px)`,
+        fontSize: `clamp(2px, ${200 / (text.length * cols)}vw, 9px)`,
         lineHeight: '1.18',
         letterSpacing: '0.07em',
         whiteSpace: 'pre',
