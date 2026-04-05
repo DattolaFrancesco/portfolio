@@ -18,12 +18,15 @@ export default function Home() {
   const isWorkRef = useRef(false)
   const dxRef = useRef(0)
   const dyRef = useRef(0)
+  const alredayLoaded = useRef(false)
+  const percentRef = useRef(null)
+  const hoveredProject = useRef(null)
+  const cursorRef = useRef(null)
     useGSAP(() => {
     const wrap = wrapperRef.current
     const ascii = asciiRef.current
     const surname = document.querySelector(".surname");
     const name = document.querySelector(".name");
-    const dot= document.querySelectorAll(".dot");
     if (!wrap) return
     if (!ascii) return
 
@@ -58,55 +61,35 @@ export default function Home() {
       pin: true,
       scrub: true,
       onUpdate: (self) =>{
+        if( percentRef.current) percentRef.current.textContent = Math.round(self.progress*100)+'%'
         if(self.progress<=0.3){
           setAsciiText("FRANCESCO");
               setAsciiSecondText("DATTOLA")
-              dot[0].classList.add("text-white")
-              dot[0].classList.add("scale-[1.5]")
-              dot[1].classList.remove("text-white")
-              dot[1].classList.remove("scale-[1.5]")
-              dot[2].classList.remove("text-white")
-              dot[2].classList.remove("scale-[1.5]")
         }
         else if(self.progress>0.35 && self.progress<0.6 )
             { 
-              dot[0].classList.remove("text-white")
-              dot[0].classList.remove("scale-[1.5]")
-              dot[2].classList.remove("text-white")
-              dot[2].classList.remove("scale-[1.5]")
-              dot[1].classList.add("text-white")
-              dot[1].classList.add("scale-[1.5]")
               setAsciiText("A FULL STACK");
               setAsciiSecondText("WEB DEVELOPER")
             }
           else if(self.progress>0.6 && self.progress<0.9)
         { 
-              dot.forEach((d)=>{
-              d.classList.remove("hidden")
-              })
-              dot[0].classList.remove("text-white")
-              dot[0].classList.remove("scale-[1.5]")
-              dot[1].classList.remove("text-white")
-              dot[1].classList.remove("scale-[1.5]")
-              dot[2].classList.add("text-white")
-              dot[2].classList.add("scale-[1.5]")
               setAsciiText("BASED");
               setAsciiSecondText("IN BRESCIA")
                surname.classList.remove("opacity-[0]")
-            const asciiRect  = ascii.getBoundingClientRect()
-            dyRef.current = asciiRect.bottom
-            dxRef.current = asciiRect.left
+               if(!alredayLoaded.current){
+                console.log("si")
+                 const asciiRect  = ascii.getBoundingClientRect()
+                 dyRef.current = asciiRect.bottom+10
+                 dxRef.current = asciiRect.left-5
+               }
             }
             else if (self.progress>0.9){
             setAsciiText("WORKS");
             surname.classList.add("opacity-[0]")
-             dot.forEach((d)=>{
-            d.classList.add("hidden")
-            })
-
             }
       },
       onEnterBack:()=>{
+        percentRef.current.classList.remove("opacity-0")
         name.classList.remove("text-start")
         isWorkRef.current = false
           gsap.to(ascii,{
@@ -115,6 +98,8 @@ export default function Home() {
         })
       },
       onLeave:()=>{
+        percentRef.current.classList.add("opacity-0")
+        alredayLoaded.current = true;
         name.classList.add("text-start")
         isWorkRef.current = true
         gsap.to(ascii,{
@@ -131,50 +116,73 @@ export default function Home() {
       wrap.removeEventListener('mouseleave', onLeave)
     }
   }, { scope: wrapperRef, dependencies:[secondRef] })
-
+ useEffect(()=>{
+      const onMove = (e)=>{
+        cursorRef.current.style.left = e.clientX + 'px'
+        cursorRef.current.style.top = e.clientY + 'px'
+      }
+      window.addEventListener('mousemove',onMove)
+      return () => window.removeEventListener('mousemove', onMove)
+    },[])
   return (
     
    <div>
+    <div ref={cursorRef} className="w-3 h-3 bg-white rounded-full fixed pointer-events-none z-50 -translate-x-1/2 -translate-y-1/2 mix-blend-difference" />
       <div ref={wrapperRef} 
        className="bg-black flex flex-col items-center justify-center w-full h-[100svh] relative">
-        <div className="absolute text-gray-400 right-[5%]">
-          <p className="dot">•</p>
-          <p className="dot">•</p>
-          <p className="dot">•</p>
-        </div>
+        <p ref={percentRef} className="text-gray-400 absolute bottom-0 right-[50%] translate-x-1/2">0%</p>
       <div ref={asciiRef} 
     style={{ perspective: '900px' }} 
    className=""
    >
           <Ascii 
       text={asciiText}
-      cols={Math.max(12, asciiText.length * 3)}        // risoluzione orizzontale
-      rows={15}        // risoluzione verticale
-      speed={100}      // ms per frame
-      thresh={1}     // soglia pixel
+      cols={Math.max(12, asciiText.length * 3)}       
+      rows={15}        
+      speed={100}    
+      thresh={1}    
       gap={2}
       className="text-white text-center name"
       />
           <Ascii 
       text={asciiSecondText}
-      cols={Math.max(12, asciiText.length * 3)}        // risoluzione orizzontale
-      rows={15}        // risoluzione verticale
-      speed={100}      // ms per frame
-      thresh={1}     // soglia pixel
+      cols={Math.max(12, asciiText.length * 3)}       
+      rows={15}        
+      speed={100}    
+      thresh={1}    
       gap={2}
       className="text-white text-center surname"
       />
       </div>
       </div>
-      <div ref={secondRef} className=" w-full h-[100svh] flex justify-between items-center">
-        <div className={`text-white w-full flex text-xs justify-between ms-[3] border-t border-b border-white py-3`}> 
-          <p>Memory Form</p>
-          <p>Archive of photo fully draggable</p>
-          <p>developed in nextJs and tailwind</p>
-        </div>
-        <Cube/>
+      <div ref={secondRef} className=" w-full h-[100svh] relative flex flex-col justify-center items-center">
+           <Cube hoveredProject={hoveredProject} className="absolute top-1/2"/>
+       <div className="text-white w-full text-sm grid grid-cols-[0.2fr_1fr_2fr_2fr_0.2fr] px-3 gap-2 uppercase mix-blend-difference">
+  <p className="text-gray-400">Id</p>
+  <p className="text-gray-400">Title</p>
+  <p className="text-gray-400">Concept</p>
+  <p className="text-gray-400">Stack</p>
+  <p className="text-gray-400">Year</p>
+
+  <div className=" contents group hover:text-green-400" 
+  onMouseEnter={()=>{hoveredProject.current = "memoryForm"}}
+  onMouseLeave={()=>{hoveredProject.current = null}}
+  >
+    <p>01</p>
+    <p>Memory Form</p>
+    <p>Archive full of draggable photos</p>
+    <p>NextJs•Tailwind</p>
+    <p>2026</p>
+  </div>
+  <div className="contents group hover:text-green-400">
+    <p>02</p>
+    <p>Elsolito/Portfolio</p>
+    <p>Navigation through Tv or GameBoy</p>
+    <p>React•Vite•Bootstrap</p>
+    <p>2026</p>
+  </div>
+</div>
       </div>
-      
    </div>
    
   )
