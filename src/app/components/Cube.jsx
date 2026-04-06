@@ -1,12 +1,14 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import gsap from 'gsap'
 
-export default function Cube({ hoveredProject }) {
+export default function Cube({ hoveredProject, velocity }) {
   const mountRef = useRef(null)
+  const tlRef = useRef(null)
 
   useEffect(() => {
-    const mount = mountRef.current  // salva subito per il cleanup
+    const mount = mountRef.current 
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000)
@@ -17,6 +19,12 @@ export default function Cube({ hoveredProject }) {
     renderer.setSize(size, size)
     renderer.setPixelRatio(window.devicePixelRatio)
     mount.appendChild(renderer.domElement)
+
+     const controls = new OrbitControls(camera, renderer.domElement)
+    controls.enableDamping = true
+    controls.dampingFactor = 0.05
+    controls.enableZoom = false
+    controls.enablePan = false
 
     const geometry = new THREE.BoxGeometry(2, 2, 2)
     const loader = new THREE.TextureLoader()
@@ -33,7 +41,7 @@ export default function Cube({ hoveredProject }) {
       video2.muted = true
       video2.playsInline = true
       video2.play()       
-    const materials = [
+    const materials1 = [
       new THREE.MeshBasicMaterial({ map: loader.load('/elsolito/homePageElsolito.webp')}), // destra
       new THREE.MeshBasicMaterial({  map: loader.load('/elsolito/infoElsolito.webp') }), // sinistra
       new THREE.MeshBasicMaterial({map: new THREE.VideoTexture(video2)  }), // top
@@ -41,7 +49,15 @@ export default function Cube({ hoveredProject }) {
       new THREE.MeshBasicMaterial({ map: new THREE.VideoTexture(video1)}), // fronte
       new THREE.MeshBasicMaterial({ map: loader.load('/elsolito/tvElsolito.webp')}), // retro
     ]
-    const cube = new THREE.Mesh(geometry, materials)
+    const materials2 = [
+      new THREE.MeshBasicMaterial({ map: loader.load('/elsolito/homePageElsolito.webp')}), // destra
+      new THREE.MeshBasicMaterial({ map: loader.load('/elsolito/infoElsolito.webp') }), // sinistra
+      new THREE.MeshBasicMaterial({map: loader.load('/elsolito/infoElsolito.webp')  }), // top
+      new THREE.MeshBasicMaterial({  map: loader.load('/elsolito/infoElsolito.webp')}), // bottom
+      new THREE.MeshBasicMaterial({ map: loader.load('/elsolito/infoElsolito.webp')}), // fronte
+      new THREE.MeshBasicMaterial({ map: loader.load('/elsolito/infoElsolito.webp')}), // retro
+    ]
+    const cube = new THREE.Mesh(geometry, materials2)
     scene.add(cube)
 
     // colore attivo tracciato fuori dal loop per evitare set() inutili
@@ -50,11 +66,20 @@ export default function Cube({ hoveredProject }) {
     let animId
     const animate = () => {
       animId = requestAnimationFrame(animate)
-
+      controls.update()
       const current = hoveredProject.current
+      if(velocity.current === 1) tlRef.current.timeScale(1)
+      if(velocity.current === 2) tlRef.current.timeScale(2)
+      if(velocity.current === 5) tlRef.current.timeScale(3)
       if (current !== lastHovered) {
-        const color = current === 'memoryForm' ? 0xff0000 : 0xff00ff
-        cube.material.forEach(m => m.color.set(color))
+        if(current === 'memoryForm'){
+            cube.material = materials2
+            cube.material.forEach((e)=>{e.needsUpdate= true})
+        }
+        else if(current === 'elsolito'){
+           cube.material = materials1
+            cube.material.forEach((e)=>{e.needsUpdate= true})
+        }
         lastHovered = current
       }
 
@@ -62,23 +87,35 @@ export default function Cube({ hoveredProject }) {
     }
     animate()
 
-    const tl = gsap.to(cube.rotation, {
-      y: Math.PI * 2,
-      x: Math.PI * 2,
+    tlRef.current = gsap.to(cube.rotation, {
+      y: Math.PI*2 ,
+      x: Math.PI*2,
       duration: 15,
       repeat: -1,
       ease: 'none',
     })
+    const onStart = () => tlRef.current.pause()
+    const onEnd = () => tlRef.current.resume()
+    renderer.domElement.addEventListener('mousedown', onStart)
+    renderer.domElement.addEventListener('touchstart', onStart)
+    window.addEventListener('mouseup', onEnd)
+    window.addEventListener('touchend', onEnd)
 
     return () => {
-      cancelAnimationFrame(animId)
-      tl.kill()                              // ferma l'animazione gsap
+   cancelAnimationFrame(animId)
+      tlRef.current.kill()
+      controls.dispose()
+      renderer.domElement.removeEventListener('mousedown', onStart)
+      renderer.domElement.removeEventListener('touchstart', onStart)
+      window.removeEventListener('mouseup', onEnd)
+      window.removeEventListener('touchend', onEnd)
       mount?.removeChild(renderer.domElement)
       geometry.dispose()
-      materials.forEach(m => m.dispose())
+      materials1.forEach(m => m.dispose())
+      materials2.forEach(m => m.dispose())
       renderer.dispose()
     }
-  }, [])  // [] va bene perché hoveredProject è un ref, non cambia mai
+  }, [])  
 
   return <div ref={mountRef} />
 }
