@@ -52,7 +52,6 @@ export default function Home() {
         ease: "power1.inOut",
       })
     }
-      
     ScrollTrigger.create({
       trigger: wrap,
       start: 'top top',
@@ -60,51 +59,54 @@ export default function Home() {
       pin: true,
       scrub: true,
       onUpdate: (self) =>{
-        if( percentRef.current) percentRef.current.textContent = Math.round(self.progress*100)+'%'
-        if(self.progress<=0.3){
+        if( percentRef.current) percentRef.current.textContent = Math.round(self.progress*132)+'%'
+        if(self.progress<=0.25){
+            gsap.to(secondRef.current,{yPercent:100,opacity:0})
           setAsciiText("FRANCESCO");
               setAsciiSecondText("DATTOLA")
         }
-        else if(self.progress>0.35 && self.progress<0.6 )
+        else if(self.progress>0.25 && self.progress<0.5 )
             { 
               setAsciiText("A FULL STACK");
               setAsciiSecondText("WEB DEVELOPER")
+              secondRef.current.classList.remove("hidden")
             }
-          else if(self.progress>0.6)
-        { 
+          else if(self.progress>0.5 && self.progress <0.75)
+        {     
+              onLeave()
+              isWorkRef.current = false
+              percentRef.current.classList.remove("opacity-0")
+              name.classList.remove("text-start")
+              gsap.to(ascii,{
+                x:0,
+                y:0
+                })
               setAsciiText("BASED");
               setAsciiSecondText("IN BRESCIA")
                surname.classList.remove("opacity-[0]")
                if(!alredayLoaded.current){
-                console.log("si")
                  const asciiRect  = ascii.getBoundingClientRect()
-                 dyRef.current = asciiRect.bottom+10
+                 dyRef.current = asciiRect.top
                  dxRef.current = asciiRect.left-5
                }
+               gsap.to(secondRef.current,{yPercent:100,opacity:0})
+            }
+            else if(self.progress>0.75){
+               isWorkRef.current = true
+                gsap.to(secondRef.current,{yPercent:0,opacity:1})
+              setAsciiText("WORKS");
+              surname.classList.add("opacity-[0]")
+              percentRef.current.classList.add("opacity-0")
+              alredayLoaded.current = true;
+              name.classList.add("text-start")
+              isWorkRef.current = true
+              gsap.to(ascii,{
+                x:-dxRef.current,
+                y:-dyRef.current
+              })
             }
             
       },
-      onEnterBack:()=>{
-        percentRef.current.classList.remove("opacity-0")
-        name.classList.remove("text-start")
-        isWorkRef.current = false
-          gsap.to(ascii,{
-          x:0,
-          y:0
-        })
-      },
-      onLeave:()=>{
-           setAsciiText("WORKS");
-           surname.classList.add("opacity-[0]")
-        percentRef.current.classList.add("opacity-0")
-        alredayLoaded.current = true;
-        name.classList.add("text-start")
-        isWorkRef.current = true
-        gsap.to(ascii,{
-          x:-dxRef.current,
-          y:dyRef.current
-        })
-      }
     })
     wrap.addEventListener('mousemove', onMove)
     wrap.addEventListener('mouseleave', onLeave)
@@ -144,8 +146,7 @@ export default function Home() {
       className="text-white text-center surname"
       />
       </div>
-      </div>
-      <div ref={secondRef} className=" w-full h-[100svh] relative flex flex-col justify-center items-center">
+       <div ref={secondRef} className=" w-full h-[100svh]  flex flex-col justify-center items-center absolute hidden">
            <Cube hoveredProject={hoveredProject} className="absolute top-1/2"/>
        <div className="text-white w-full text-sm grid grid-cols-[0.2fr_1fr_2fr_2fr_0.2fr] px-3 gap-2 uppercase mix-blend-difference">
   <p className="text-gray-400">Id</p>
@@ -173,6 +174,8 @@ export default function Home() {
   </div>
 </div>
       </div>
+      </div>
+     
    </div>
    
   )
