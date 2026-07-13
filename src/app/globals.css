@@ -12,7 +12,6 @@ body{
 }
 
 p{
-  font-size: 20px;
   line-height: 0.8;
 }
 .text-scrumble{
@@ -39,5 +38,9 @@ canvas{
 .button-hero:hover{
   background: var(--hover-bg);
   color: var(--hover-color);
+}
+p{
+  font-size: 20px;
+  line-height: 0.8;
 }
 }
