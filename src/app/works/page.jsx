@@ -12,9 +12,9 @@ const nameWork = ["SkateSpot", "Lollo Gallery", "Elsolito"];
 const typeWork = ["Community driven", "Gallery", "Portfolio"];
 const yearWork = ["2026", "2026", "2026"];
 const linkWork = [
-  "https://github.com/DattolaFrancesco/skatemap-be",
-  "https://github.com/DattolaFrancesco/lollo-gallery",
-  "https://github.com/DattolaFrancesco/portfolio-dani-react",
+  "https://skatemap-frontend.vercel.app/",
+  "https://lollo-gallery.vercel.app/",
+  "https://www.elsolito.it/",
 ];
 
 const infoWork = [
