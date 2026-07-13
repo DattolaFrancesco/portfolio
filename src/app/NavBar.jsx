@@ -33,6 +33,7 @@ export default function NavBar(){
             ease: "power2.out",
         });
 
+
         gsap.to(document.documentElement, {
             "--hover-bg": theme.hoverBg,
             "--hover-color": theme.hoverColor,
