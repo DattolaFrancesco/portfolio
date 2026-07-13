@@ -1,13 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 @import "tailwindcss";
 
+:root{
+  --hover-bg: rgb(65, 223, 7);
+  --hover-color: black;
+}
+
 body{
   font-family: "VT323", monospace;
   background: rgb(255, 255, 255);
 }
 
 p{
-  font-size: 12px;
+  font-size: 20px;
   line-height: 0.8;
 }
 .text-scrumble{
@@ -32,12 +37,7 @@ canvas{
 }
 @media (min-width: 768px) {
 .button-hero:hover{
-  background: rgb(65, 223, 7);
-  color: black;
-}
-p{
-  font-size: 20px;
-  line-height: 0.8;
+  background: var(--hover-bg);
+  color: var(--hover-color);
 }
 }
-

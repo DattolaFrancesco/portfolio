@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import ButtonScramble from "../ButtonScramble";
+import ScrambleText from "../ScrambleText";
 
 const workDesktop = ["/image1.png", "/image2.png", "/image3.png"];
 const nameWork = ["SkateSpot", "Lollo Gallery", "Elsolito"];
@@ -64,6 +65,7 @@ function InfoButton({ open, onClick }) {
 
 function WorkItem({ src, name, type, year, info, link, i }) {
   const [open, setOpen] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const panelRef = useRef(null);
   const innerRef = useRef(null);
   const tweenRef = useRef(null);
@@ -80,38 +82,23 @@ function WorkItem({ src, name, type, year, info, link, i }) {
 
     // Anima grid-template-rows (0fr -> 1fr): il browser interpola il layout
     // in modo nativo, senza dover leggere/scrivere offsetHeight ad ogni frame.
-    // Risultato: apertura/chiusura fluide anche con contenuto di lunghezza variabile.
+    // Nessun opacity/transform sull'ancestor: eviterebbe di creare uno
+    // stacking context che spezza il mix-blend-difference dei figli.
     const tl = gsap.timeline();
     tweenRef.current = tl;
 
     if (open) {
       tl.to(panel, {
         gridTemplateRows: "1fr",
-        opacity: 1,
         duration: 0.55,
         ease: "power3.out",
-      }).fromTo(
-        inner,
-        { y: 14, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" },
-        "-=0.35"
-      );
+      });
     } else {
-      tl.to(inner, {
-        y: 8,
-        opacity: 0,
-        duration: 0.2,
-        ease: "power1.in",
-      }).to(
-        panel,
-        {
-          gridTemplateRows: "0fr",
-          opacity: 0,
-          duration: 0.4,
-          ease: "power3.inOut",
-        },
-        "-=0.05"
-      );
+      tl.to(panel, {
+        gridTemplateRows: "0fr",
+        duration: 0.4,
+        ease: "power3.inOut",
+      });
     }
 
     return () => {
@@ -122,9 +109,9 @@ function WorkItem({ src, name, type, year, info, link, i }) {
   return (
     <div className="w-[90%] sm:w-3/4 md:w-2/3">
       <div className="flex w-full justify-between items-center gap-2 mix-blend-difference text-white flex-wrap">
-        <h1 className="text-sm sm:text-lg md:text-xl">{type}</h1>
+        <ScrambleText as="h1" text={type} className="text-sm sm:text-lg md:text-xl" />
         <div className="flex items-center gap-2">
-          <h1 className="text-sm sm:text-lg md:text-xl">{name}</h1>
+          <ScrambleText as="h1" text={name} className="text-sm sm:text-lg md:text-xl" />
           <InfoButton open={open} onClick={() => setOpen((v) => !v)} />
         </div>
       </div>
@@ -133,42 +120,60 @@ function WorkItem({ src, name, type, year, info, link, i }) {
         href={link}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative w-full h-full aspect-video block cursor-pointer"
+        className="relative w-full h-full aspect-video block cursor-pointer overflow-hidden"
       >
+        {!loaded && (
+          <div className="absolute inset-0 bg-black/10 animate-pulse" />
+        )}
         <Image
           key={`desktop-${i}`}
           src={src}
           alt={name}
           fill
-          className="object-cover"
+          className={`object-cover transition-opacity duration-500 ${
+            loaded ? "opacity-100" : "opacity-0"
+          }`}
+          onLoad={() => setLoaded(true)}
         />
       </a>
 
-      <h1 className="mix-blend-difference text-white text-sm sm:text-base md:text-lg">{year}</h1>
+      <ScrambleText
+        as="h1"
+        text={year}
+        className="mix-blend-difference text-white text-sm sm:text-base md:text-lg"
+      />
 
       <div
         ref={panelRef}
-        className="grid will-change-[grid-template-rows,opacity]"
-        style={{ gridTemplateRows: "0fr", opacity: 0 }}
+        className="grid will-change-[grid-template-rows]"
+        style={{ gridTemplateRows: "0fr" }}
       >
         <div className="overflow-hidden">
           <div
             ref={innerRef}
             className="flex flex-col gap-1.5 sm:gap-2 py-2 sm:py-3  border-t border-black/20"
           >
-            <p className="text-xs sm:text-base md:text-lg">{info.description}</p>
-            <p className="text-[11px] sm:text-sm md:text-base opacity-70">
-              <span className="font-bold">Role:</span> {info.role}
-            </p>
-            <p className="text-[11px] sm:text-sm md:text-base opacity-70">
-              <span className="font-bold">Frontend:</span>{" "}
-              {info.stack.frontend.join(", ")}
-            </p>
+            <ScrambleText
+              as="p"
+              text={info.description}
+              className="mix-blend-difference text-white text-xs sm:text-base md:text-lg"
+            />
+            <ScrambleText
+              as="p"
+              text={`Role: ${info.role}`}
+              className="mix-blend-difference text-white text-[11px] sm:text-sm md:text-base opacity-70"
+            />
+            <ScrambleText
+              as="p"
+              text={`Frontend: ${info.stack.frontend.join(", ")}`}
+              className="mix-blend-difference text-white text-[11px] sm:text-sm md:text-base opacity-70"
+            />
             {info.stack.backend && (
-              <p className="text-[11px] sm:text-sm md:text-base opacity-70">
-                <span className="font-bold">Backend:</span>{" "}
-                {info.stack.backend.join(", ")}
-              </p>
+              <ScrambleText
+                as="p"
+                text={`Backend: ${info.stack.backend.join(", ")}`}
+                className="mix-blend-difference text-white text-[11px] sm:text-sm md:text-base opacity-70"
+              />
             )}
           </div>
         </div>
