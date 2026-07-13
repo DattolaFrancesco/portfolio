@@ -7,7 +7,7 @@ import gsap from "gsap";
 import ButtonScramble from "../ButtonScramble";
 import ScrambleText from "../ScrambleText";
 
-const workDesktop = ["/image1.png", "/image2.png", "/image3.png"];
+const workDesktop = ["/image1.JPG", "/image2.JPG", "/image3.JPG"];
 const nameWork = ["SkateSpot", "Lollo Gallery", "Elsolito"];
 const typeWork = ["Community driven", "Gallery", "Portfolio"];
 const yearWork = ["2026", "2026", "2026"];
