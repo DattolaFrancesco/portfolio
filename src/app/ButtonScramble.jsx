@@ -45,6 +45,6 @@ export default function ButtonScramble({text,hrefLink,blank,style,onClick}){
     }, [glitch, text]);
 
     return(
-        <Link className={`button-hero`} target={blank  ? "_blank": ""}  href={hrefLink ?? ""} onMouseEnter={(e)=>textScramble(e.currentTarget)} onClick={(e)=>{onClick();textScramble(e.currentTarget)}}><p ref={pRef} className={`mix-blend-difference text-white ${style}`}>{text}</p></Link>
+        <Link className={`button-hero`} target={blank  ? "_blank": ""}  href={hrefLink ?? ""} onMouseEnter={(e)=>textScramble(e.currentTarget)} onClick={onClick}><p ref={pRef} className={`mix-blend-difference text-white ${style}`}>{text}</p></Link>
     )
 }
