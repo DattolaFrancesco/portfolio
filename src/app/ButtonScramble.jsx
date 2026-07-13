@@ -16,6 +16,6 @@ export default function ButtonScramble({text,hrefLink,blank,style}){
         gsap.to(p, {duration: 0.5, scrambleText: {text: `${originalText}`,chars: "@#$%^&*_+-;:,.<>?"}});
     }
     return(
-        <Link className={`button-hero`} target={blank  ? "_blank": ""}  href={hrefLink ?? ""} onMouseEnter={(e)=>textScramble(e.currentTarget)}><p className={`mix-blend-difference text-white ${style}`}>{text}</p></Link>
+        <Link className={`button-hero`} target={blank  ? "_blank": ""}  href={hrefLink ?? ""} onMouseEnter={(e)=>textScramble(e.currentTarget)}><p className={`mix-blend-difference text-white text-scrumble ${style}`}>{text}</p></Link>
     )
 }

@@ -10,7 +10,10 @@ p{
   font-size: 12px;
   line-height: 0.8;
 }
-
+.text-scrumble{
+  font-size: 20px;
+  line-height: 0.8;
+}
 canvas{
   display: block;
   width: 100%;
