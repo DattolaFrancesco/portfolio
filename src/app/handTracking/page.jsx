@@ -100,11 +100,11 @@ export default function HandTracking(){
                         </div>
                    </div>
                 </div>
-            <div className="mt-50">
+            {modelReady ? <div className="mt-50">
                 {gesture === "" &&<div className="w-full flex justify-center"> <p className="mix-blend-difference text-white">Use your hand to navigate through the portfolio</p></div>}
                 {gesture === "🖐️" && <About/>}
                 {gesture === "☝️" && <Works/>}
-            </div>
+            </div> : <div className="w-screen h-screen flex justify-center items-center"><p>Model is loading</p></div>}
         </div>
     )
 }
