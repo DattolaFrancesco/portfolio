@@ -49,6 +49,7 @@ export default function NavBar(){
             <ButtonScramble text={"about"} hrefLink={"/about"}/>
             <ButtonScramble text={"gitHub"} hrefLink={"https://github.com/DattolaFrancesco"} blank={true}/>
             <ButtonScramble text={"email"} hrefLink={"mailto:dattolafrancescoo@gmail.com"}/>
+            <ButtonScramble text={"handTracking"} hrefLink={"/handTracking"}/>
             <ButtonScramble text={"glitch"} onClick={toggleGlitch}/>
         </nav>
     ) 
