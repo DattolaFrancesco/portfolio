@@ -80,11 +80,16 @@ export default function HandTracking(){
     useEffect(()=>{
     if(gesture ===  "🤟") router.push("/")
     },[gesture])
+    useEffect(()=>{
+     return () => {
+        if (stream) stream.getTracks().forEach((track) => track.stop())
+    }
+    },[stream])
     return (
         <div className="w-screen h-screen">
-                <div className="w-fit flex p-3 justify-between fixed top-0 z-[999]">
-                   <div className="flex p-3 gap-3 bg-black/20 rounded-xl">
-                        <video ref={videoRef} autoPlay muted playsInline className="w-1/2 md:w-50 h-35 md:h-full object-cover rounded-xl"/>
+                <div className="w-full md:w-fit flex p-3 justify-between fixed top-0 z-[999]">
+                   <div className="w-full flex p-3 gap-3 bg-black/20 rounded-xl">
+                        <video ref={videoRef} autoPlay muted playsInline className="w-full md:w-50 h-35 md:h-full object-cover rounded-xl"/>
                         <div className="flex flex-col gap-3">
                             <p className="mix-blend-difference text-white text-sm md:text-base">Current gesture : {gesture}</p>
                             <p className="mix-blend-difference text-white text-sm md:text-base">Works : ☝️</p>
