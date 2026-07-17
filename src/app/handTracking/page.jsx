@@ -13,8 +13,24 @@ export default function HandTracking(){
     const gestureRecognizer = useRef(null);
     const [modelReady, setModelReady] = useState(false);
     const refIdAnimationFrame = useRef(null)
+    const canvasRef = useRef(null)
     const [gesture,setGesture] = useState("")
     const [gestureScroll,setGestureScroll] = useState(null)
+    
+    const HAND_CONNECTIONS = [
+    // pollice
+    [0,1],[1,2],[2,3],[3,4],
+    // indice
+    [0,5],[5,6],[6,7],[7,8],
+    // medio
+    [5,9],[9,10],[10,11],[11,12],
+    // anulare
+    [9,13],[13,14],[14,15],[15,16],
+    // mignolo
+    [13,17],[17,18],[18,19],[19,20],
+    // palmo (base delle dita + polso)
+    [0,17]
+]
 
     const loadModel = async()=>{
         const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm")
@@ -42,15 +58,43 @@ export default function HandTracking(){
         setStream(null)
         if(refIdAnimationFrame.current) cancelAnimationFrame(refIdAnimationFrame.current)
     }
+    const drawDot = (x,y)=>{
+        const canvas = canvasRef.current
+        if(!canvas) return
+        const ctx = canvas.getContext("2d")
+        ctx.beginPath()
+        ctx.arc(x*canvas.width, y*canvas.height, 2, 0, 2 * Math.PI)
+        ctx.fillStyle = "lime"
+        ctx.fill()
+    } 
+    const drawLine = (a, b) => {
+        const canvas = canvasRef.current
+        if (!canvas) return
+        const ctx = canvas.getContext("2d")
+        ctx.beginPath()
+        ctx.moveTo(a.x * canvas.width, a.y * canvas.height)
+        ctx.lineTo(b.x * canvas.width, b.y * canvas.height)
+        ctx.strokeStyle = "black"
+        ctx.lineWidth = 1.5
+        ctx.stroke()
+}
     const detectHands = ()=>{
         if(!videoRef.current) return
         if(gestureRecognizer.current){
             const video = videoRef.current
             const startMs = performance.now()
             const results = gestureRecognizer.current.recognizeForVideo(video,startMs)
+             const canvas = canvasRef.current
+            if(!canvas) return
+            const ctx = canvas.getContext("2d")
+            ctx.clearRect(0,0, canvas.width, canvas.height)
+            results.landmarks.forEach((hand)=> {
+                HAND_CONNECTIONS.forEach(([startIdx, endIdx]) => {
+                    drawLine(hand[startIdx], hand[endIdx])
+                })
+                hand.forEach((d)=>drawDot(d.x,d.y))
+            })
             switch(results.gestures[0]?.[0].categoryName){
-                // case "Closed_Fist" : setGesture("✊");
-                // break
                 case "Open_Palm" : setGesture("🖐️");
                 break
                 case "Pointing_Up" : setGesture("☝️");
@@ -89,7 +133,17 @@ export default function HandTracking(){
         <div className="w-screen h-screen">
                 <div className="w-full md:w-fit flex p-3 justify-between fixed top-0 z-[999]">
                    <div className="w-full flex p-3 gap-3 bg-black/20 rounded-xl">
-                        <video ref={videoRef} autoPlay muted playsInline className="w-full md:w-50 h-35 md:h-full object-cover rounded-xl"/>
+                       <div className="relative w-full md:w-50 h-35 md:h-full">
+                            <video 
+                                ref={videoRef} 
+                                autoPlay muted playsInline 
+                                className="w-full h-full object-cover rounded-xl"
+                            />
+                            <canvas 
+                                ref={canvasRef}
+                                className="absolute inset-0 w-full h-full rounded-xl pointer-events-none"
+                            />
+                        </div>
                         <div className="flex flex-col gap-3">
                             <p className="mix-blend-difference text-white text-sm md:text-base">Current gesture : {gesture}</p>
                             <p className="mix-blend-difference text-white text-sm md:text-base">Works : ☝️</p>
