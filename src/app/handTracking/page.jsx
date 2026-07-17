@@ -147,7 +147,7 @@ export default function HandTracking(){
         <div className="w-screen h-screen">
                 <div className="w-full md:w-fit flex p-3 justify-between fixed top-0 z-[999]">
                    <div className="w-full flex p-3 gap-3 bg-black/20 rounded-xl">
-                       <div className="relative w-full md:w-50 h-35 md:h-full">
+                       <div className="relative w-50 md:w-50 h-30 md:h-full">
                             <video 
                                 ref={videoRef} 
                                 autoPlay muted playsInline 
@@ -159,12 +159,12 @@ export default function HandTracking(){
                             />
                         </div>
                         <div className="flex flex-col gap-3">
-                            <p className="mix-blend-difference text-white text-sm md:text-base">Current gesture : {gesture}</p>
-                            <p className="mix-blend-difference text-white text-sm md:text-base">Works : ☝️</p>
-                            <p className="mix-blend-difference text-white text-sm md:text-base">About : 🖐️</p>
-                            <p className="mix-blend-difference text-white text-sm md:text-base">Home : 🤟</p>
-                            <p className="mix-blend-difference text-white text-sm md:text-base">Up : 👍</p>
-                            <p className="mix-blend-difference text-white text-sm md:text-base">Down : 👎</p>
+                            <p className="text-sm md:text-base">Current gesture : {gesture}</p>
+                            <p className="text-sm md:text-base">Works : ☝️</p>
+                            <p className="text-sm md:text-base">About : 🖐️</p>
+                            <p className="text-sm md:text-base">Home : 🤟</p>
+                            <p className="text-sm md:text-base">Up : 👍</p>
+                            <p className="text-sm md:text-base">Down : 👎</p>
                         </div>
                    </div>
                 </div>
