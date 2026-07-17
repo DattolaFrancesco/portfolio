@@ -30,7 +30,7 @@ export default function HandTracking(){
     [13,17],[17,18],[18,19],[19,20],
     // palmo (base delle dita + polso)
     [0,17]
-]
+    ]
 
     const loadModel = async()=>{
         const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm")
@@ -41,13 +41,23 @@ export default function HandTracking(){
         })
         setModelReady(true)
     }
+    const syncCanvasSize = () => {
+        const canvas = canvasRef.current
+        const video = videoRef.current
+        if (!canvas || !video) return
+        canvas.width = video.clientWidth
+        canvas.height = video.clientHeight
+    }
     const startCamera = async()=>{
        try {
         const camera = await navigator.mediaDevices.getUserMedia({ video: true })
         setStream(camera)
         if (videoRef.current){ 
             videoRef.current.srcObject = camera
-            videoRef.current.addEventListener("loadeddata",detectHands, {once:true})
+            videoRef.current.addEventListener("loadeddata", () => {
+            syncCanvasSize()
+            detectHands()
+        }, {once:true})
         }
         } catch (err) {
             console.error("Errore fotocamera:", err.message)
@@ -129,6 +139,10 @@ export default function HandTracking(){
         if (stream) stream.getTracks().forEach((track) => track.stop())
     }
     },[stream])
+    useEffect(() => {
+    window.addEventListener("resize", syncCanvasSize)
+    return () => window.removeEventListener("resize", syncCanvasSize)
+}, [])
     return (
         <div className="w-screen h-screen">
                 <div className="w-full md:w-fit flex p-3 justify-between fixed top-0 z-[999]">
